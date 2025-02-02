@@ -13,29 +13,32 @@ import {
 import { Input } from "@/components/ui/input"
 import { addScam } from "@/lib/appwrite"
 import { Textarea } from "./ui/textarea"
-import { Loader } from "lucide-react"
-import { useState } from "react"
+import { CalendarIcon, Loader } from "lucide-react"
 import { useForm } from "react-hook-form"
 import { Form, FormField, FormItem, FormLabel, FormControl, FormDescription, FormMessage } from "./ui/form"
 import { z } from "zod"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { toast } from "@/hooks/use-toast";
+import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
+import { format } from "date-fns";
+import { Calendar } from "./ui/calendar";
+import { cn } from "@/lib/utils";
 
 const formSchema = z.object({
   phoneNumber: z.string().max(8),
   smsContent: z.string().min(1),
-  dateReceived: z.string().min(1),
+  dateReceived: z.date({
+    required_error: "A received date is required.",
+  }),
 });
 
 export function AddNewDialog() {
-  const [date, setDate] = useState<Date | null>(null);
-
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       phoneNumber: "",
       smsContent: "",
-      dateReceived: "",
+      dateReceived: new Date(),
     },
   });
 
@@ -43,23 +46,23 @@ export function AddNewDialog() {
     addScam({
       phoneNumber: values["phoneNumber"] as string,
       smsContent: values["smsContent"] as string,
-      dateReceived: values["dateReceived"] as string
+      dateReceived: values["dateReceived"] as Date
     })
-    .then(() => {
-      toast({
-        title: "Success",
-        description: "Record added successfully"
+      .then(() => {
+        toast({
+          title: "Success",
+          description: "Record added successfully"
+        });
+        form.reset();
+      })
+      .catch((error) => {
+        console.error(error);
+        toast({
+          variant: "destructive",
+          title: "Uh oh! Something went wrong.",
+          description: "Failed to add the record"
+        });
       });
-      form.reset();
-    })
-    .catch((error) => {
-      console.error(error);
-      toast({
-        variant: "destructive",
-        title: "Uh oh! Something went wrong.",
-        description: "Failed to add the record"
-      });
-    });
   }
 
   return (
@@ -69,9 +72,9 @@ export function AddNewDialog() {
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>Edit profile</DialogTitle>
+          <DialogTitle>Add New Record</DialogTitle>
           <DialogDescription>
-            Make changes to your profile here. Click save when you're done.
+            Add a new record to the database.
           </DialogDescription>
         </DialogHeader>
         <div className="grid gap-4 py-4">
@@ -87,7 +90,7 @@ export function AddNewDialog() {
                   <FormItem>
                     <FormLabel>Phone Number</FormLabel>
                     <FormControl>
-                      <Input placeholder="8xxxxxxx" maxLength={8} {...field} />
+                      <Input placeholder="7xxxxxx or 8xxxxxxx" maxLength={8} {...field} />
                     </FormControl>
                     <FormDescription />
                     <FormMessage />
@@ -99,38 +102,36 @@ export function AddNewDialog() {
                 control={form.control}
                 name="dateReceived"
                 render={({ field }) => (
-                  <FormItem>
+                  <FormItem className="flex flex-col">
                     <FormLabel>Date Received</FormLabel>
-                    <FormControl>
-                      <Input type="date" {...field} />
-
-                      {/* <Popover>
-                <PopoverTrigger asChild>
-                  <Button
-                    variant={"outline"}
-                    className={cn(
-                      "w-[240px] justify-start text-left font-normal",
-                      !date && "text-muted-foreground"
-                    )}
-                  >
-                    <CalendarIcon />
-                    {date ? format(date, "PPP") : <span>Pick a date</span>}
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent className="w-auto p-0" align="start">
-                  <Calendar
-                    mode="single"
-                    selected={date}
-                    onSelect={setDate}
-                    initialFocus
-                  />
-                </PopoverContent>
-              </Popover> */}
-                    </FormControl>
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <FormControl>
+                          <Button
+                            variant={"outline"}
+                            className={cn(
+                              "w-[240px] justify-start text-left font-normal",
+                              !field.value && "text-muted-foreground"
+                            )}
+                          >
+                            <CalendarIcon />
+                            {field.value ? format(field.value, "PPP") : <span>Pick a date</span>}
+                          </Button>
+                        </FormControl>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-auto p-0" align="start">
+                        <Calendar
+                          mode="single"
+                          selected={field.value}
+                          onSelect={field.onChange}
+                          disabled={(date) => date > new Date() || date < new Date("1900-01-01")}
+                          initialFocus
+                        />
+                      </PopoverContent>
+                    </Popover>
                   </FormItem>
                 )}
               />
-
 
               <FormField
                 control={form.control}
@@ -152,7 +153,7 @@ export function AddNewDialog() {
         </div>
         <DialogFooter>
           <Button form="form" type="submit">
-            {form.formState.isLoading && <Loader className="animate-spin"/>} Submit
+            {form.formState.isLoading && <Loader className="animate-spin" />} Submit
           </Button>
         </DialogFooter>
       </DialogContent>

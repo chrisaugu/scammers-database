@@ -4,7 +4,7 @@ const ENDPOINT_URL = String(process.env.NEXT_PUBLIC_APPWRITE_ENDPOINT_URL);
 const PROJECT_ID = String(process.env.NEXT_PUBLIC_APPWRITE_PROJECT);
 const DATABASE_ID = String(process.env.NEXT_PUBLIC_APPWRITE_DATABASE);
 const SMS_COLLECTION_ID = String(process.env.NEXT_PUBLIC_APPWRITE_COLLECTION_SMS);
-const PHONE_NUMBER_COLLECTION_ID = String(process.env.NEXT_PUBLIC_APPWRITE_COLLECTION_PHONE_NUMBER);
+// const PHONE_NUMBER_COLLECTION_ID = String(process.env.NEXT_PUBLIC_APPWRITE_COLLECTION_PHONE_NUMBER);
 
 // Permission.read()
 
@@ -13,11 +13,11 @@ export type ScamSMS = Omit<Models.Document, '$id' | '$databaseId' | '$collection
     phoneNumber: string
     smsIp?: string
     smsContent: string,
-    dateReceived: string
+    dateReceived: Date
 }
 
 export async function createSessionClient() {
-    let client = new Client();
+    const client = new Client();
     client
         .setEndpoint(ENDPOINT_URL)
         .setProject(PROJECT_ID);
@@ -43,7 +43,8 @@ export async function getLoggedInUser() {
         const { account } = await createSessionClient();
         return await account.get();
     } catch (error) {
-        return null;
+        const appwriteError = error as AppwriteException;
+        throw new Error(appwriteError.message)
     }
 }
 

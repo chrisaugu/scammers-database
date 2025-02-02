@@ -13,19 +13,9 @@ import {
     getSortedRowModel,
     useReactTable,
 } from "@tanstack/react-table";
-import { ArrowUpDown, MoreHorizontal } from "lucide-react";
+import { ArrowUpDown } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
-import {
-    DropdownMenu,
-    DropdownMenuCheckboxItem,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuLabel,
-    DropdownMenuSeparator,
-    DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
 import {
     Table,
@@ -120,7 +110,7 @@ export function DataTable() {
 
     useEffect(() => {
         getScams().then((scams) => {
-            let d = scams.map((scam) => ({
+            const d = scams.map((scam) => ({
                 id: scam.$id,
                 phoneNumber: scam.phoneNumber,
                 smsIp: scam.smsIp,

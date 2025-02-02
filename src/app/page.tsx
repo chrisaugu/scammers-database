@@ -1,14 +1,3 @@
-import { Button } from "@/components/ui/button";
-import Image from "next/image";
-import {
-  Table,
-  TableBody,
-  TableCaption,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table"
 import { DataTable } from "@/components/table";
 import Link from "next/link";
 
@@ -27,7 +16,7 @@ export default function Home() {
       </main>
 
       <footer className="row-start-3 flex gap-1 flex-wrap justify-center">
-        A project by <Link href="https://twitter.com/christianaugustyn" className="text-blue-600">Christian Augustyn</Link>
+        A project by <Link href="https://github.com/chrisaugu" className="text-blue-600">Christian Augustyn</Link>
       </footer>
     </div>
   );
