@@ -16,7 +16,7 @@ export default function Home() {
       </main>
 
       <footer className="row-start-3 flex gap-1 flex-wrap justify-center">
-        A project by <Link href="https://github.com/chrisaugu" className="text-blue-600">Christian Augustyn</Link>
+        Built with ❤️ by <Link href="https://github.com/fantastixpng" className="text-blue-600">Fantastix</Link>
       </footer>
     </div>
   );
